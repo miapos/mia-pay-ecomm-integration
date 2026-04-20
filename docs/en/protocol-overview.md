@@ -67,6 +67,10 @@ After obtaining the `accessToken`, the merchant must register the payment using 
 
 The client will be redirected to the `checkoutPage` URL to complete the payment.
 
+**Optional field — `directRedirect`** (`boolean`, default: `false`, QR only):
+
+When set to `true`, the checkout page will automatically redirect mobile users to the banking app to complete the QR payment, without requiring a manual button tap. The page continues polling payment status in the background and redirects to `successUrl`/`failUrl` upon completion.
+
 ---
 
 ### **4. Handling Payment Results**

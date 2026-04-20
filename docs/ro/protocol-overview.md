@@ -67,6 +67,10 @@ După obținerea `accessToken`, comerciantul trebuie să înregistreze plata uti
 
 Clientul este redirecționat la URL-ul `checkoutPage` pentru finalizarea plății.
 
+**Câmp opțional — `directRedirect`** (`boolean`, implicit: `false`, doar QR):
+
+Când este setat la `true`, pagina de checkout redirecționează automat utilizatorii mobili către aplicația bancară pentru finalizarea plății QR, fără a fi necesară apăsarea manuală a unui buton. Pagina continuă să verifice statusul plății în fundal și redirecționează către `successUrl`/`failUrl` la finalizare.
+
 ---
 
 ### **4. Gestionarea rezultatelor plății**

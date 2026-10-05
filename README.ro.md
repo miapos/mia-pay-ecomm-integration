@@ -17,10 +17,10 @@
 
 Pentru diferite platforme de eCommerce, sunt disponibile soluții care simplifică procesul de integrare cu MIA POS. Consultați soluțiile de mai jos:
 
-- [MIA Pay Ecomm PHP SDK](https://github.com/finergy-tech/mia-pay-ecomm-php-sdk) - SDK pentru PHP.
-- [MIA Pay Gateway pentru CsCart](https://github.com/finergy-tech/mia-pay-gateway-for-cscart).
-- [MIA Pay Gateway pentru OpenCart](https://github.com/finergy-tech/mia-pay-gateway-for-opencart).
-- [MIA Pay Gateway pentru WooCommerce](https://github.com/finergy-tech/mia-pay-gateway-for-woocommerce).
+- [MIA Pay Ecomm PHP SDK](https://github.com/miapos/mia-pay-ecomm-php-sdk) - SDK pentru PHP.
+- [MIA Pay Gateway pentru CsCart](https://github.com/miapos/mia-pay-gateway-for-cscart).
+- [MIA Pay Gateway pentru OpenCart](https://github.com/miapos/mia-pay-gateway-for-opencart).
+- [MIA Pay Gateway pentru WooCommerce](https://github.com/miapos/mia-pay-gateway-for-woocommerce).
 
 Aceste soluții includ funcționalități predefinite pentru interacțiunea cu API-ul MIA POS și sunt configurate pentru a gestiona toate fluxurile necesare (generare token-uri, procesarea plăților, callback-uri etc.).
 

@@ -8,6 +8,7 @@ Acest document descrie în detaliu modul de funcționare a protocolului **MIA PO
 
 - [Documentația API (descărcați și deschideți în browser)](../mia-ecomm-api_v0.0.1.html)
 - [Ghid de verificare a semnăturii](./signature-verification.md)
+- [Plata pe pagina magazinului, fără redirecționare (versiune preliminară)](./embedded-checkout.md)
 
 ---
 

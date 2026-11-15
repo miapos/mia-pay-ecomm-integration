@@ -28,7 +28,8 @@ the merchant during payment initiation.
     "status": "SUCCESS",
     "amount": 145.25,
     "currency": "MDL",
-    "paymentDate": "2024-05-20T16:32:28+03:00",
+    "paymentType": "qr",
+    "paymentDate": "2024-05-20T16:32:28",
     "swiftMessageId": "swift123",
     "swiftPayerBank": "SomeBank"
   },
@@ -43,7 +44,8 @@ the merchant during payment initiation.
 The public key can be obtained by making the following request to the eComm service:
 
 - **Method:** `GET`
-- **Endpoint:** `/api/v1/public-key`
+- **Endpoint:** `/ecomm/api/v1/public-key`
+- **Header:** `Authorization: Bearer <accessToken>`, the token from `POST /ecomm/api/v1/token`. The test environment and every bank have their own key.
 
 **Example Response:**
 
@@ -61,12 +63,13 @@ To create the string used for verifying the signature, follow these steps:
 
 1. Extract the `result` object from the JSON.
 2. Sort all fields of the `result` object alphabetically.
-3. Concatenate the values of all fields using `;` as the separator.
+3. Convert each value to a string. `amount` is always written with exactly two decimals (`1775` → `1775.00`, `12.5` → `12.50`); every other value is used as received.
+4. Concatenate the values of all fields using `;` as the separator.
 
 **Example Result:**
 
 ```
-145.25;MDL;2024-05-20T16:32:28+03:00;order123;bc340d13-7411-4785-a083-b594b1384eb5;SUCCESS;swift123;SomeBank;123456
+145.25;MDL;order123;2024-05-20T16:32:28;bc340d13-7411-4785-a083-b594b1384eb5;qr;SUCCESS;swift123;SomeBank;123456
 ```
 
 ---
@@ -84,6 +87,9 @@ the `signature` field.
 
 ```java
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -102,8 +108,11 @@ public class SignatureVerification {
             String base64Signature = (String) jsonMap.get("signature");
 
             Map<String, Object> sortedMap = new TreeMap<>(resultMap);
-            String signatureString = sortedMap.values().stream()
-                    .map(Object::toString)
+            // amount is always signed with two decimals: 1775 -> 1775.00
+            String signatureString = sortedMap.entrySet().stream()
+                    .map(e -> "amount".equals(e.getKey())
+                            ? new BigDecimal(e.getValue().toString()).setScale(2, RoundingMode.HALF_UP).toPlainString()
+                            : e.getValue().toString())
                     .collect(Collectors.joining(";"));
 
             byte[] decodedKey = Base64.getDecoder().decode(publicKeyPEM);
@@ -113,7 +122,7 @@ public class SignatureVerification {
 
             Signature signature = Signature.getInstance("SHA256withRSA");
             signature.initVerify(publicKey);
-            signature.update(signatureString.getBytes());
+            signature.update(signatureString.getBytes(StandardCharsets.UTF_8));
 
             byte[] signatureBytes = Base64.getDecoder().decode(base64Signature);
             return signature.verify(signatureBytes);
@@ -130,18 +139,23 @@ public class SignatureVerification {
 ```python
 import json
 import base64
+from decimal import Decimal
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 
 def verify_signature(json_string, public_key_base64):
     try:
-        json_data = json.loads(json_string)
+        json_data = json.loads(json_string, parse_float=Decimal)
         result = json_data['result']
         signature_base64 = json_data['signature']
 
         sorted_items = sorted(result.items())
-        signature_string = ';'.join([str(value) for key, value in sorted_items])
+        # amount is always signed with two decimals: 1775 -> 1775.00
+        signature_string = ';'.join(
+            f"{Decimal(str(value)):.2f}" if key == 'amount' else str(value)
+            for key, value in sorted_items
+        )
 
         public_key = serialization.load_pem_public_key(
             f"-----BEGIN PUBLIC KEY-----\n{public_key_base64}\n-----END PUBLIC KEY-----".encode()
@@ -150,7 +164,7 @@ def verify_signature(json_string, public_key_base64):
         signature = base64.b64decode(signature_base64)
         public_key.verify(
             signature,
-            signature_string.encode(),
+            signature_string.encode("utf-8"),
             padding.PKCS1v15(),
             hashes.SHA256()
         )

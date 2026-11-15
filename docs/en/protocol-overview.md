@@ -8,6 +8,7 @@ This document provides a detailed explanation of the **MIA POS eComm** protocol 
 
 - [API Documentation (download and open in browser)](../mia-ecomm-api_v0.0.1.html)
 - [Signature Verification Guide](./signature-verification.md)
+- [Embedded Checkout: accepting the payment on your own page (preview)](./embedded-checkout.md)
 
 ---
 

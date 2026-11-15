@@ -46,6 +46,7 @@
 
 - [Общее описание протокола](./docs/ru/protocol-overview.md)
 - [Инструкция по проверке подписи](./docs/ru/signature-verification.md)
+- [Оплата на странице магазина (JavaScript-виджет, предварительная версия)](./docs/ru/embedded-checkout.md)
 
 ---
 

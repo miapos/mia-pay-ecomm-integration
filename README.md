@@ -46,6 +46,7 @@ Usage instructions:
 
 - [Protocol Overview](./docs/en/protocol-overview.md)
 - [Signature Verification Guide](./docs/en/signature-verification.md)
+- [Embedded Checkout (JavaScript widget, preview)](./docs/en/embedded-checkout.md)
 
 ---
 

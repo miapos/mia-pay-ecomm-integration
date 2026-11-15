@@ -46,6 +46,7 @@ Instrucțiuni de utilizare:
 
 - [Prezentare generală a protocolului](./docs/ro/protocol-overview.md)
 - [Ghid de verificare a semnăturii](./docs/ro/signature-verification.md)
+- [Plata pe pagina magazinului (widget JavaScript, versiune preliminară)](./docs/ro/embedded-checkout.md)
 
 ---
 

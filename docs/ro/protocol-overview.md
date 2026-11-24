@@ -52,6 +52,28 @@ Dacă comerciantul nu are un `refreshToken`, trebuie să obțină un `accessToke
 - **Tip:** `POST`
 - **Endpoint:** `/ecomm/api/v1/token`
 
+**Limita de solicitări.** Solicitările către `POST /ecomm/api/v1/token` sunt limitate pe adresa IP a clientului (adresa serverului dumneavoastră, de la care MIA POS primește solicitarea). Limitele implicite, într-o fereastră de 60 de secunde: 300 de solicitări de token și 20 de autentificări refuzate (`merchantId` necunoscut sau `secretKey` greșit); banca poate stabili alte valori. După ce limita de autentificări refuzate este atinsă, orice solicitare de token de la acea adresă este refuzată până la sfârșitul ferestrei, inclusiv cele cu date corecte.
+
+La depășirea limitei, endpoint-ul răspunde cu `429 Too Many Requests`, antetul `Retry-After` (numărul de secunde de așteptat) și corpul obișnuit de eroare:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 42
+Cache-Control: no-store
+Content-Type: application/json
+
+{
+  "errorCode": "3",
+  "errorMessage": "Too many token requests, try again later"
+}
+```
+
+Ce trebuie să facă integrarea:
+
+- La `429`, așteptați numărul de secunde indicat în `Retry-After`, apoi repetați solicitarea.
+- Nu repetați în buclă `merchantId` / `secretKey` refuzate: un răspuns `400` sau `401` nu se schimbă la repetare, verificați datele de acces.
+- Păstrați `accessToken` primit până la expirare (`accessTokenExpiresIn`, în secunde) și reînnoiți-l prin `refreshToken` (secțiunea 3.2). Nu solicitați o nouă pereche de token-uri pentru fiecare operațiune.
+
 #### **3.2. Reîmprospătarea token-ului**
 
 Dacă comerciantul are un `refreshToken`, poate obține un nou `accessToken` folosind următorul endpoint:

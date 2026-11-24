@@ -52,6 +52,28 @@ If the merchant does not have a `refreshToken`, they must request an `accessToke
 - **Method:** `POST`
 - **Endpoint:** `/ecomm/api/v1/token`
 
+**Request limit.** Requests to `POST /ecomm/api/v1/token` are limited per client IP address (the address of your server as seen by MIA POS). Default limits, counted in a window of 60 seconds: 300 token requests and 20 refused sign-ins (unknown `merchantId` or wrong `secretKey`); the bank can set other values. After the refused sign-ins limit is reached, every token request from that address is refused until the window ends, including requests with correct credentials.
+
+Over the limit the endpoint responds with `429 Too Many Requests`, the `Retry-After` header (number of seconds to wait) and the usual error body:
+
+```http
+HTTP/1.1 429 Too Many Requests
+Retry-After: 42
+Cache-Control: no-store
+Content-Type: application/json
+
+{
+  "errorCode": "3",
+  "errorMessage": "Too many token requests, try again later"
+}
+```
+
+What your integration should do:
+
+- On `429`, wait for the number of seconds given in `Retry-After`, then repeat the request.
+- Do not repeat a refused `merchantId` / `secretKey` in a loop: a `400` or `401` response will not change on retry, check the credentials instead.
+- Keep the received `accessToken` until it expires (`accessTokenExpiresIn`, in seconds) and renew it with the `refreshToken` (section 3.2). Do not request a new token pair for every operation.
+
 #### **3.2. Refreshing the Access Token**
 
 If the merchant already has a `refreshToken`, they can refresh the `accessToken` by using the following endpoint:
